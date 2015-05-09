@@ -20,6 +20,10 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 
 import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
 
 public class WifiControl {
 
@@ -122,5 +126,34 @@ public class WifiControl {
 
 	public boolean disable() {
 		return setWifiApEnabled(null, false);
+	}
+
+	public static InetAddress getInetAddress() {
+		InetAddress resAddr = null;
+
+		try {
+			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+			while (ifaces.hasMoreElements()) {
+				NetworkInterface iface = ifaces.nextElement();
+
+				Enumeration<InetAddress> addrs = iface.getInetAddresses();
+				while (addrs.hasMoreElements()) {
+					InetAddress addr = addrs.nextElement();
+
+					if (addr.isLoopbackAddress()) {
+					       continue;
+					}
+
+					final String ifaceName = iface.getDisplayName();
+					if (ifaceName.contains("wlan0")) {
+						resAddr = addr;
+					}
+				}
+			}
+
+		} catch (SocketException e) {
+			// Ignored, we just return a zero value
+		}
+		return resAddr;
 	}
 }
