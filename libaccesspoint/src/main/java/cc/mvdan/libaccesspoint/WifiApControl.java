@@ -94,6 +94,10 @@ public class WifiApControl {
 		return false;
 	}
 
+	public boolean isEnabled() {
+		return isWifiApEnabled();
+	}
+
 	public static int newStateNumber(int state) {
 		// WifiManager's state constants were changed around Android 4.0
 		if (state < 10) {
@@ -111,6 +115,10 @@ public class WifiApControl {
 		return -1;
 	}
 
+	public int getState() {
+		return getWifiApState();
+	}
+
 	public WifiConfiguration getWifiApConfiguration() {
 		try {
 			return (WifiConfiguration) getWifiApConfiguration.invoke(wm);
@@ -120,6 +128,10 @@ public class WifiApControl {
 		return null;
 	}
 
+	public WifiConfiguration getConfiguration() {
+		return getWifiApConfiguration();
+	}
+
 	public boolean setWifiApEnabled(WifiConfiguration config, boolean enabled) {
 		try {
 			return (Boolean) setWifiApEnabled.invoke(wm, config, enabled);
@@ -127,6 +139,10 @@ public class WifiApControl {
 			Log.e(TAG, "", e);
 		}
 		return false;
+	}
+
+	public boolean setEnabled(WifiConfiguration config, boolean enabled) {
+		return setWifiApEnabled(config, enabled);
 	}
 
 	public boolean enable() {
