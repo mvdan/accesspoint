@@ -5,6 +5,7 @@ import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import java.lang.StringBuilder;
@@ -27,7 +28,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-		refreshStatus();
+		refresh();
 	}
 
 	private static String stateString(int state) {
@@ -47,7 +48,7 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private void refreshStatus() {
+	private void refresh() {
 		TextView tv = (TextView) findViewById(R.id.text1);
 		StringBuilder sb = new StringBuilder();
 		if (!WifiApControl.isSupported()) {
@@ -75,10 +76,14 @@ public class MainActivity extends Activity {
 		final InetAddress addr = WifiApControl.getInetAddress();
 		sb.append("InetAddress: ");
 		if (addr == null) {
-			sb.append("null\n");
+			sb.append("null");
 		} else {
-			sb.append(addr.toString()).append('\n');
+			sb.append(addr.toString());
 		}
 		tv.setText(sb.toString());
+	}
+
+	public void viewRefresh(View view) {
+		refresh();
 	}
 }
