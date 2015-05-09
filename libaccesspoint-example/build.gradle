@@ -1,0 +1,26 @@
+apply plugin: 'com.android.application'
+
+dependencies {
+	compile project(':libaccesspoint')
+}
+
+android {
+	compileSdkVersion 22
+	buildToolsVersion "22.0.1"
+
+	defaultConfig {
+		minSdkVersion 4
+		targetSdkVersion 22
+	}
+
+	compileOptions {
+		sourceCompatibility JavaVersion.VERSION_1_6
+		targetCompatibility JavaVersion.VERSION_1_6
+	}
+
+	gradle.projectsEvaluated {
+		tasks.withType(JavaCompile) {
+			options.compilerArgs << "-Xlint:all"
+		}
+	}
+}

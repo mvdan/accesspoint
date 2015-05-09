@@ -1,1 +1,2 @@
 include ':libaccesspoint'
+include ':libaccesspoint-example'
