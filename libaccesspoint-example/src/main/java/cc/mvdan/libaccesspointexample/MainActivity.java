@@ -2,9 +2,12 @@ package cc.mvdan.libaccesspointexample;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.widget.TextView;
 import android.content.Context;
+
+import java.lang.StringBuilder;
 
 import cc.mvdan.libaccesspoint.WifiApControl;
 
@@ -26,31 +29,48 @@ public class MainActivity extends Activity {
 		refreshStatus();
 	}
 
-	private static String describeWifiApState(int state) {
+	private static String stateString(int state) {
 		switch (state) {
 			case WifiApControl.STATE_FAILED:
-				return "Failed state: could not enable or disable";
+				return "FAILED";
 			case WifiApControl.STATE_DISABLED:
-				return "Disabled state: AP is currently off";
+				return "DISABLED";
 			case WifiApControl.STATE_DISABLING:
-				return "Disabling state: AP is currently being turned off";
+				return "DISABLING";
 			case WifiApControl.STATE_ENABLED:
-				return "Enabled state: AP is currently on";
+				return "ENABLED";
 			case WifiApControl.STATE_ENABLING:
-				return "Enabling state: AP is currently being turned on";
+				return "ENABLING";
 			default:
-				return "Unknown state!";
+				return "UNKNOWN!";
 		}
 	}
 
 	private void refreshStatus() {
 		TextView tv = (TextView) findViewById(R.id.text1);
+		StringBuilder sb = new StringBuilder();
 		if (!WifiApControl.isSupported()) {
-			tv.setText("AP mode not supported!");
-		} else {
-			int state = apControl.getWifiApState();
-			final String desc = describeWifiApState(state);
-			tv.setText(desc);
+			sb.append("Warning: Wifi AP mode not supported!\n");
+			sb.append("You should get unknown or zero values below.\n");
+			sb.append("If you don't, isSupported() is probably buggy!\n");
 		}
+		int state = apControl.getState();
+		sb.append("State: ").append(stateString(state)).append('\n');
+		sb.append("Enabled: ");
+		if (apControl.isEnabled()) {
+			sb.append("YES\n");
+		} else {
+			sb.append("NO\n");
+		}
+		final WifiConfiguration wifiConfig = apControl.getConfiguration();
+		sb.append("WifiConfiguration:");
+		if (wifiConfig == null) {
+			sb.append(" null\n");
+		} else {
+			sb.append("\n");
+			sb.append("   SSID: \"").append(wifiConfig.SSID).append("\"\n");
+			sb.append("   preSharedKey: \"").append(wifiConfig.preSharedKey).append("\"\n");
+		}
+		tv.setText(sb.toString());
 	}
 }
