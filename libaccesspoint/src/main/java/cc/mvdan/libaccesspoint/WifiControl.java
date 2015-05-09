@@ -47,6 +47,12 @@ public class WifiControl {
 		}
 	}
 
+	public static final int STATE_DISABLING = 10;
+	public static final int STATE_DISABLED  = 11;
+	public static final int STATE_ENABLING  = 12;
+	public static final int STATE_ENABLED   = 13;
+	public static final int STATE_FAILED    = 14;
+
 	public static boolean isSoftwareSupported() {
 		return (getWifiApState != null
 				&& isWifiApEnabled != null
