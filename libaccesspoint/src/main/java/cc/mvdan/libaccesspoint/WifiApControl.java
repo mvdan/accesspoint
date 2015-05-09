@@ -25,7 +25,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-public class WifiControl {
+public class WifiApControl {
 
 	private static Method getWifiApConfiguration;
 	private static Method getWifiApState;
@@ -71,15 +71,15 @@ public class WifiControl {
 
 	private final WifiManager wm;
 
-	private WifiControl(WifiManager wm) {
+	private WifiApControl(WifiManager wm) {
 		this.wm = wm;
 	}
 
-	public static WifiControl getApControl(WifiManager wm) {
+	public static WifiApControl getApControl(WifiManager wm) {
 		if (!isSupported()) {
 			return null;
 		}
-		return new WifiControl(wm);
+		return new WifiApControl(wm);
 	}
 
 	public boolean isWifiApEnabled() {
