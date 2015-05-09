@@ -1,13 +1,14 @@
 package cc.mvdan.libaccesspointexample;
 
 import android.app.Activity;
-import android.os.Bundle;
+import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.widget.TextView;
-import android.content.Context;
 
 import java.lang.StringBuilder;
+import java.net.InetAddress;
 
 import cc.mvdan.libaccesspoint.WifiApControl;
 
@@ -70,6 +71,13 @@ public class MainActivity extends Activity {
 			sb.append("\n");
 			sb.append("   SSID: \"").append(wifiConfig.SSID).append("\"\n");
 			sb.append("   preSharedKey: \"").append(wifiConfig.preSharedKey).append("\"\n");
+		}
+		final InetAddress addr = WifiApControl.getInetAddress();
+		sb.append("InetAddress: ");
+		if (addr == null) {
+			sb.append("null\n");
+		} else {
+			sb.append(addr.toString()).append('\n');
 		}
 		tv.setText(sb.toString());
 	}
