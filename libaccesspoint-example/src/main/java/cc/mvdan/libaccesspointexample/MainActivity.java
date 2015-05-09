@@ -83,7 +83,25 @@ public class MainActivity extends Activity {
 		tv.setText(sb.toString());
 	}
 
-	public void viewRefresh(View view) {
+	public void refresh(View view) {
 		refresh();
+	}
+
+	public void enable() {
+		apControl.enable();
+		refresh();
+	}
+
+	public void enable(View view) {
+		enable();
+	}
+
+	public void disable() {
+		apControl.disable();
+		refresh();
+	}
+
+	public void disable(View view) {
+		enable();
 	}
 }

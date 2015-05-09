@@ -15,7 +15,21 @@
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:text="@string/refresh"
-		android:onClick="viewRefresh"
-		android:layout_margin="6dp"
+		android:onClick="refresh"
+		android:layout_margin="4dp"
+		/>
+	<Button
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/enable"
+		android:onClick="enable"
+		android:layout_margin="4dp"
+		/>
+	<Button
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/disable"
+		android:onClick="disable"
+		android:layout_margin="4dp"
 		/>
 </LinearLayout>

@@ -2,4 +2,6 @@
 <resources>
 	<string name="app_name">LibAP Example</string>
 	<string name="refresh">Refresh</string>
+	<string name="enable">Enable</string>
+	<string name="disable">Disable</string>
 </resources>
