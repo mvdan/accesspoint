@@ -18,6 +18,7 @@ package cc.mvdan.libaccesspoint;
 
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import java.lang.reflect.Method;
 import java.net.InetAddress;
@@ -26,6 +27,8 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 public class WifiApControl {
+
+	private static final String TAG = "WifiApControl";
 
 	private static Method getWifiApConfiguration;
 	private static Method getWifiApState;
@@ -86,7 +89,7 @@ public class WifiApControl {
 		try {
 			return (Boolean) isWifiApEnabled.invoke(wm);
 		} catch (Exception e) {
-			// Ignored, we just return a zero value
+			Log.e(TAG, "", e);
 		}
 		return false;
 	}
@@ -103,7 +106,7 @@ public class WifiApControl {
 		try {
 			return newStateNumber((Integer) getWifiApState.invoke(wm));
 		} catch (Exception e) {
-			// Ignored, we just return a zero value
+			Log.e(TAG, "", e);
 		}
 		return -1;
 	}
@@ -112,7 +115,7 @@ public class WifiApControl {
 		try {
 			return (WifiConfiguration) getWifiApConfiguration.invoke(wm);
 		} catch (Exception e) {
-			// Ignored, we just return a zero value
+			Log.e(TAG, "", e);
 		}
 		return null;
 	}
@@ -121,7 +124,7 @@ public class WifiApControl {
 		try {
 			return (Boolean) setWifiApEnabled.invoke(wm, config, enabled);
 		} catch (Exception e) {
-			// Ignored, we just return a zero value
+			Log.e(TAG, "", e);
 		}
 		return false;
 	}
@@ -158,7 +161,7 @@ public class WifiApControl {
 			}
 
 		} catch (SocketException e) {
-			// Ignored, we just return a zero value
+			Log.e(TAG, "", e);
 		}
 		return resAddr;
 	}
