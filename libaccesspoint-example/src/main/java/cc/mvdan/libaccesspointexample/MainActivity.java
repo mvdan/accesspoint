@@ -16,13 +16,14 @@ import cc.mvdan.libaccesspoint.WifiApControl;
 public class MainActivity extends Activity {
 
 	private WifiApControl apControl;
+	private WifiManager wifiManager;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
-		WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		apControl = WifiApControl.getApControl(wm);
+		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		apControl = WifiApControl.getApControl(wifiManager);
 	}
 
 	@Override
@@ -88,6 +89,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void enable() {
+		wifiManager.setWifiEnabled(false);
 		apControl.enable();
 		refresh();
 	}
@@ -98,6 +100,7 @@ public class MainActivity extends Activity {
 
 	public void disable() {
 		apControl.disable();
+		wifiManager.setWifiEnabled(true);
 		refresh();
 	}
 
