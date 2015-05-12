@@ -16,8 +16,8 @@ import cc.mvdan.libaccesspoint.WifiApControl;
 
 public class MainActivity extends Activity {
 
-	private WifiApControl apControl;
 	private WifiManager wifiManager;
+	private WifiApControl apControl;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +40,7 @@ public class MainActivity extends Activity {
 						});
 					}
 				} catch (InterruptedException e) {
+					// ignored
 				}
 			}
 		}.start();
@@ -121,8 +122,7 @@ public class MainActivity extends Activity {
 		} else {
 			sb.append('\n');
 			for (final WifiApControl.Client c : reachable) {
-				sb.append("   ").append(c.IPAddr);
-				sb.append(" ").append(c.HWAddr).append('\n');
+				sb.append("   ").append(c.IPAddr).append(" ").append(c.HWAddr).append('\n');
 			}
 		}
 		if (sb.length() > 0) {
@@ -154,6 +154,7 @@ public class MainActivity extends Activity {
 						}
 					});
 				} catch (InterruptedException e) {
+					// ignored
 				}
 			}
 		}.start();
