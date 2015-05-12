@@ -62,14 +62,14 @@ public class WifiApControl {
 	public static final int STATE_ENABLED   = WIFI_AP_STATE_ENABLED;
 	public static final int STATE_FAILED    = WIFI_AP_STATE_FAILED;
 
-	public static boolean isSoftwareSupported() {
+	private static boolean isSoftwareSupported() {
 		return (getWifiApState != null
 				&& isWifiApEnabled != null
 				&& setWifiApEnabled != null
 				&& getWifiApConfiguration != null);
 	}
 
-	public static boolean isHardwareSupported() {
+	private static boolean isHardwareSupported() {
 		// TODO: implement via native code
 		return true;
 	}
