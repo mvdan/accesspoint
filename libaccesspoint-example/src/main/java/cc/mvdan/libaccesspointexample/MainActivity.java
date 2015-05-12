@@ -24,6 +24,25 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.main);
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		apControl = WifiApControl.getApControl(wifiManager);
+
+		final Thread t = new Thread() {
+			@Override
+			public void run() {
+				try {
+					while (!isInterrupted()) {
+						Thread.sleep(1000);
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								refresh();
+							}
+						});
+					}
+				} catch (InterruptedException e) {
+				}
+			}
+		};
+		t.start();
 	}
 
 	@Override
@@ -32,7 +51,7 @@ public class MainActivity extends Activity {
 		refresh();
 	}
 
-	private static String stateString(int state) {
+	private static String stateString(final int state) {
 		switch (state) {
 			case WifiApControl.STATE_FAILED:
 				return "FAILED";
@@ -50,14 +69,14 @@ public class MainActivity extends Activity {
 	}
 
 	private void refresh() {
-		TextView tv = (TextView) findViewById(R.id.text1);
-		StringBuilder sb = new StringBuilder();
+		final TextView tv = (TextView) findViewById(R.id.text1);
+		final StringBuilder sb = new StringBuilder();
 		if (!WifiApControl.isSupported()) {
 			sb.append("Warning: Wifi AP mode not supported!\n");
 			sb.append("You should get unknown or zero values below.\n");
 			sb.append("If you don't, isSupported() is probably buggy!\n");
 		}
-		int state = apControl.getState();
+		final int state = apControl.getState();
 		sb.append("State: ").append(stateString(state)).append('\n');
 		sb.append("Enabled: ");
 		if (apControl.isEnabled()) {
