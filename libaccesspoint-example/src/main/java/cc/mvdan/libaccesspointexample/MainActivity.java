@@ -129,14 +129,12 @@ public class MainActivity extends Activity {
 		refresh();
 	}
 
-	public void enable(final View view) {
-		final Button button = (Button) view;
-		button.setEnabled(false);
+	private void enableButtonAfter(final Button button, final long time) {
 		new Thread() {
 			@Override
 			public void run() {
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(time);
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
@@ -147,7 +145,13 @@ public class MainActivity extends Activity {
 				}
 			}
 		}.start();
+	}
+
+	public void enable(final View view) {
+		final Button button = (Button) view;
+		button.setEnabled(false);
 		enable();
+		enableButtonAfter(button, 1000);
 	}
 
 	public void disable() {
@@ -159,21 +163,7 @@ public class MainActivity extends Activity {
 	public void disable(final View view) {
 		final Button button = (Button) view;
 		button.setEnabled(false);
-		new Thread() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(1000);
-					runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							button.setEnabled(true);
-						}
-					});
-				} catch (InterruptedException e) {
-				}
-			}
-		}.start();
 		disable();
+		enableButtonAfter(button, 1000);
 	}
 }
