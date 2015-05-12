@@ -50,11 +50,17 @@ public class WifiApControl {
 		}
 	}
 
-	public static final int STATE_DISABLING = 10;
-	public static final int STATE_DISABLED  = 11;
-	public static final int STATE_ENABLING  = 12;
-	public static final int STATE_ENABLED   = 13;
-	public static final int STATE_FAILED    = 14;
+	public static final int WIFI_AP_STATE_DISABLING = 10;
+	public static final int WIFI_AP_STATE_DISABLED  = 11;
+	public static final int WIFI_AP_STATE_ENABLING  = 12;
+	public static final int WIFI_AP_STATE_ENABLED   = 13;
+	public static final int WIFI_AP_STATE_FAILED    = 14;
+
+	public static final int STATE_DISABLING = WIFI_AP_STATE_DISABLING;
+	public static final int STATE_DISABLED  = WIFI_AP_STATE_DISABLED;
+	public static final int STATE_ENABLING  = WIFI_AP_STATE_ENABLING;
+	public static final int STATE_ENABLED   = WIFI_AP_STATE_ENABLED;
+	public static final int STATE_FAILED    = WIFI_AP_STATE_FAILED;
 
 	public static boolean isSoftwareSupported() {
 		return (getWifiApState != null
