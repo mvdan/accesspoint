@@ -165,8 +165,10 @@ public class WifiApControl {
 		return setWifiApEnabled(null, false);
 	}
 
-	public static InetAddress getInetAddress() {
-		InetAddress resAddr = null;
+	public InetAddress getInetAddress() {
+		if (!isEnabled()) {
+			return null;
+		}
 
 		try {
 			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
@@ -183,7 +185,7 @@ public class WifiApControl {
 
 					final String ifaceName = iface.getDisplayName();
 					if (ifaceName.contains("wlan0")) {
-						resAddr = addr;
+						return addr;
 					}
 				}
 			}
@@ -191,7 +193,7 @@ public class WifiApControl {
 		} catch (SocketException e) {
 			Log.e(TAG, "", e);
 		}
-		return resAddr;
+		return null;
 	}
 
 	public static class Client {

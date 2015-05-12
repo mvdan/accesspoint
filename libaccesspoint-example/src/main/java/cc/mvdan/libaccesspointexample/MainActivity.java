@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
 			sb.append("   SSID: \"").append(config.SSID).append("\"\n");
 			sb.append("   preSharedKey: \"").append(config.preSharedKey).append("\"\n");
 		}
-		final InetAddress addr = WifiApControl.getInetAddress();
+		final InetAddress addr = apControl.getInetAddress();
 		sb.append("InetAddress: ");
 		if (addr == null) {
 			sb.append("null\n");
