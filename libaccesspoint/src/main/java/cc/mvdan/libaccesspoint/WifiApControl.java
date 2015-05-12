@@ -46,15 +46,19 @@ public class WifiApControl {
 
 	static {
 		for (Method method : WifiManager.class.getDeclaredMethods()) {
-			String name = method.getName();
-			if (name.equals("getWifiApConfiguration")) {
+			switch (method.getName()) {
+			case "getWifiApConfiguration":
 				getWifiApConfiguration = method;
-			} else if (name.equals("getWifiApState")) {
+				break;
+			case "getWifiApState":
 				getWifiApState = method;
-			} else if (name.equals("isWifiApEnabled")) {
+				break;
+			case "isWifiApEnabled":
 				isWifiApEnabled = method;
-			} else if (name.equals("setWifiApEnabled")) {
+				break;
+			case "setWifiApEnabled":
 				setWifiApEnabled = method;
+				break;
 			}
 		}
 	}
@@ -262,7 +266,7 @@ public class WifiApControl {
 		if (!isEnabled()) {
 			return null;
 		}
-		final List<Client> result = new ArrayList<Client>();
+		final List<Client> result = new ArrayList<>();
 
 		// Basic sanity checks
 		final Pattern macPattern = Pattern.compile("..:..:..:..:..:..");
