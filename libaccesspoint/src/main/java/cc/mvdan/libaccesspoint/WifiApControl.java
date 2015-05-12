@@ -19,8 +19,8 @@ package cc.mvdan.libaccesspoint;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.util.Log;
-
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -107,6 +107,11 @@ public class WifiApControl {
 	}
 
 	private static String getWifiDeviceName(final WifiManager wifiManager) {
+		if (Build.VERSION.SDK_INT < 9) {
+			Log.w(TAG, "Older device - falling back to the default wifi device name: " + fallbackWifiDevice);
+			return fallbackWifiDevice;
+		}
+
 		final WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 		final String wifiMacString = wifiInfo.getMacAddress();
 		final byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
@@ -131,7 +136,7 @@ public class WifiApControl {
 			Log.e(TAG, "", e);
 		}
 
-		Log.w(TAG, "Falling back to the default wifi device name: " + fallbackWifiDevice);
+		Log.w(TAG, "None found - falling back to the default wifi device name: " + fallbackWifiDevice);
 		return fallbackWifiDevice;
 	}
 
