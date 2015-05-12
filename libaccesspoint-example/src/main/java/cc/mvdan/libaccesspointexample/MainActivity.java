@@ -124,6 +124,6 @@ public class MainActivity extends Activity {
 	}
 
 	public void disable(View view) {
-		enable();
+		disable();
 	}
 }
