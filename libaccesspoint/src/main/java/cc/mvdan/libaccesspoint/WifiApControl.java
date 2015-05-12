@@ -227,7 +227,7 @@ public class WifiApControl {
 					InetAddress addr = addrs.nextElement();
 
 					if (addr.isLoopbackAddress()) {
-					       continue;
+						continue;
 					}
 
 					final String ifaceName = iface.getDisplayName();
