@@ -290,7 +290,9 @@ public class WifiApControl {
 			Log.e(TAG, "", e);
 		} finally {
 			try {
-				br.close();
+				if (br != null) {
+					br.close();
+				}
 			} catch (IOException e) {
 				Log.e(TAG, "", e);
 			}
