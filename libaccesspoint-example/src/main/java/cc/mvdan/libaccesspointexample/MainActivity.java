@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.lang.StringBuilder;
 import java.net.InetAddress;
 
 import cc.mvdan.libaccesspoint.WifiApControl;
