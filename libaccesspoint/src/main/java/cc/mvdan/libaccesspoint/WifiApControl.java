@@ -29,7 +29,6 @@ import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -136,7 +135,7 @@ public class WifiApControl {
 					return iface.getName();
 				}
 			}
-		} catch (SocketException e) {
+		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		}
 
@@ -246,7 +245,7 @@ public class WifiApControl {
 				}
 			}
 
-		} catch (SocketException e) {
+		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		}
 		return null;
@@ -295,7 +294,7 @@ public class WifiApControl {
 
 				result.add(new Client(IPAddr, HWAddr));
 			}
-		} catch (Exception e) {
+		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		} finally {
 			try {
