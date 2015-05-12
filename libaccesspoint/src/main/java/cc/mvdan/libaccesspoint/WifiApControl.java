@@ -40,6 +40,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
 
+// WifiApControl provides control over Wi-Fi APs using the singleton pattern.
+// Even though isSupported should be reliable, the underlying hidden APIs that
+// are obtained via reflection to provide the main functionalities may not
+// work as expected.
 public class WifiApControl {
 
 	private static final String TAG = "WifiApControl";
@@ -92,6 +96,7 @@ public class WifiApControl {
 		return true;
 	}
 
+	// isSupported reports whether Wi-Fi APs are supported by this device.
 	public static boolean isSupported() {
 		return isSoftwareSupported() && isHardwareSupported();
 	}
@@ -108,10 +113,19 @@ public class WifiApControl {
 		wifiDevice = getWifiDeviceName(wm);
 	}
 
+	// getInstance is a standard singleton instance getter, constructing
+	// the actual class when first called.
 	public static WifiApControl getInstance(final Context context) {
 		if (instance == null) {
 			instance = new WifiApControl(context);
 		}
+		return instance;
+	}
+
+	// getInstance is a commodity singleton instance getter that doesn't
+	// require a context granted that it has been provided at least once
+	// before. Will return null if that is not the case.
+	public static WifiApControl getInstance() {
 		return instance;
 	}
 
@@ -158,6 +172,7 @@ public class WifiApControl {
 		return macAddress;
 	}
 
+	// isWifiApEnabled returns whether the Wi-Fi AP is currently enabled.
 	public boolean isWifiApEnabled() {
 		try {
 			return (Boolean) isWifiApEnabled.invoke(wm);
@@ -167,18 +182,21 @@ public class WifiApControl {
 		return false;
 	}
 
+	// isEnabled is a commodity function alias for isWifiApEnabled.
 	public boolean isEnabled() {
 		return isWifiApEnabled();
 	}
 
+	// newStateNumber adapts the state constants to the current values in
+	// the SDK. They were changed on 4.0 to have higher integer values.
 	public static int newStateNumber(int state) {
-		// WifiManager's state constants were changed around Android 4.0
 		if (state < 10) {
 			return state + 10;
 		}
 		return state;
 	}
 
+	// getWifiDeviceName returns the current Wi-Fi AP state.
 	public int getWifiApState() {
 		try {
 			return newStateNumber((Integer) getWifiApState.invoke(wm));
@@ -188,10 +206,12 @@ public class WifiApControl {
 		return -1;
 	}
 
+	// getState is a commodity function alias for getWifiApState.
 	public int getState() {
 		return getWifiApState();
 	}
 
+	// getWifiApConfiguration returns the current Wi-Fi AP configuration.
 	public WifiConfiguration getWifiApConfiguration() {
 		try {
 			return (WifiConfiguration) getWifiApConfiguration.invoke(wm);
@@ -201,10 +221,16 @@ public class WifiApControl {
 		return null;
 	}
 
+	// getConfiguration is a commodity function alias for
+	// getWifiApConfiguration.
 	public WifiConfiguration getConfiguration() {
 		return getWifiApConfiguration();
 	}
 
+	// setWifiApEnabled starts a Wi-Fi AP with the specified
+	// configuration. If one is already running, start using the new
+	// configuration. You should call WifiManager.setWifiEnabled(false)
+	// yourself before calling this method.
 	public boolean setWifiApEnabled(WifiConfiguration config, boolean enabled) {
 		try {
 			return (Boolean) setWifiApEnabled.invoke(wm, config, enabled);
@@ -214,18 +240,24 @@ public class WifiApControl {
 		return false;
 	}
 
+	// setEnabled is a commodity function alias for setWifiApEnabled.
 	public boolean setEnabled(WifiConfiguration config, boolean enabled) {
 		return setWifiApEnabled(config, enabled);
 	}
 
+	// enable starts the currently configured Wi-Fi AP.
 	public boolean enable() {
 		return setWifiApEnabled(getWifiApConfiguration(), true);
 	}
 
+	// disable stops any currently running Wi-Fi AP.
 	public boolean disable() {
 		return setWifiApEnabled(null, false);
 	}
 
+	// getInetAddress returns the IP address that the device has in its
+	// own Wi-Fi AP local network. Will return null if no Wi-Fi AP is
+	// currently enabled.
 	public InetAddress getInetAddress() {
 		if (!isEnabled()) {
 			return null;
@@ -257,8 +289,13 @@ public class WifiApControl {
 		return null;
 	}
 
+	// Client describes a Wi-Fi AP device connected to the network.
 	public static class Client {
+
+		// IPAddr is the raw string of the IP Address client
 		public String IPAddr;
+
+		// HWAddr is the raw string of the MAC of the client
 		public String HWAddr;
 
 		public Client(String IPAddr, String HWAddr) {
@@ -267,6 +304,10 @@ public class WifiApControl {
 		}
 	}
 
+	// getClients returns a list of all clients connected to the network.
+	// Since the information is pulled from ARP, which is cached for up to
+	// five minutes, this method may yield clients that disconnected
+	// minutes ago.
 	public List<Client> getClients() {
 		if (!isEnabled()) {
 			return null;
@@ -315,10 +356,18 @@ public class WifiApControl {
 		return result;
 	}
 
+	// ReachableClientListener is an interface to collect the results
+	// provided by getReachableClients via callbacks.
 	public interface ReachableClientListener {
+
+		// Function called each time a reachable client is found.
 		void onReachableClient(Client c);
 	}
 
+	// getReachableClients fetches the clients connected to the network
+	// much like getClients, but only those which are reachable. Since
+	// checking for reachability requires network I/O, the results are
+	// provided via callbacks.
 	public void getReachableClients(final ReachableClientListener listener,
 			final int timeout) {
 		final List<Client> clients = getClients();
@@ -342,6 +391,11 @@ public class WifiApControl {
 		}
 	}
 
+	// getReachableClients returns a list of the clients connected to the
+	// network which are reachable. Like getReachableClients, but the
+	// function doesn't return until all tasks are done and it returns the
+	// results all in one. Easier to use, but beware of blocking your UI
+	// thread.
 	public List<Client> getReachableClientsList(final int timeout) {
 		final List<Client> clients = getClients();
 		if (clients == null) {
