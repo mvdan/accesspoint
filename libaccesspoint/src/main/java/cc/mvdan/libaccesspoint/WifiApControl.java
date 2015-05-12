@@ -17,13 +17,16 @@
 package cc.mvdan.libaccesspoint;
 
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -84,17 +87,61 @@ public class WifiApControl {
 		return isSoftwareSupported() && isHardwareSupported();
 	}
 
-	private final WifiManager wm;
+	private static final String fallbackWifiDevice = "wlan0";
 
-	private WifiApControl(WifiManager wm) {
+	private final WifiManager wm;
+	private final String wifiDevice;
+
+	private WifiApControl(WifiManager wm, String wifiDevice) {
 		this.wm = wm;
+		this.wifiDevice = wifiDevice;
 	}
 
 	public static WifiApControl getApControl(WifiManager wm) {
 		if (!isSupported()) {
 			return null;
 		}
-		return new WifiApControl(wm);
+
+		final String wifiDevice = getWifiDeviceName(wm);
+		return new WifiApControl(wm, wifiDevice);
+	}
+
+	private static String getWifiDeviceName(final WifiManager wifiManager) {
+		final WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+		final String wifiMacString = wifiInfo.getMacAddress();
+		final byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
+		final BigInteger wifiMac = new BigInteger(wifiMacBytes);
+
+		try {
+			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
+			while (ifaces.hasMoreElements()) {
+				NetworkInterface iface = ifaces.nextElement();
+
+				final byte[] hardwareAddress = iface.getHardwareAddress();
+				if (hardwareAddress == null) {
+					continue;
+				}
+
+				final BigInteger currentMac = new BigInteger(hardwareAddress);
+				if (currentMac.equals(wifiMac)) {
+					return iface.getName();
+				}
+			}
+		} catch (SocketException e) {
+			Log.e(TAG, "", e);
+		}
+
+		Log.w(TAG, "Falling back to the default wifi device name: " + fallbackWifiDevice);
+		return fallbackWifiDevice;
+	}
+
+	static private byte[] macAddressToByteArray(final String macString) {
+		final String[] mac = macString.split("[:\\s-]");
+		final byte[] macAddress = new byte[6];
+		for (int i = 0; i < mac.length; i++) {
+			macAddress[i] = Integer.decode("0x" + mac[i]).byteValue();
+		}
+		return macAddress;
 	}
 
 	public boolean isWifiApEnabled() {
@@ -184,7 +231,7 @@ public class WifiApControl {
 					}
 
 					final String ifaceName = iface.getDisplayName();
-					if (ifaceName.contains("wlan0")) {
+					if (ifaceName.contains(wifiDevice)) {
 						return addr;
 					}
 				}
@@ -227,9 +274,9 @@ public class WifiApControl {
 
 				final String IPAddr = parts[0];
 				final String HWAddr = parts[3];
-				final String Device = parts[5];
+				final String device = parts[5];
 
-				if (!Device.equals("wlan0")) {
+				if (!device.equals(wifiDevice)) {
 					continue;
 				}
 
