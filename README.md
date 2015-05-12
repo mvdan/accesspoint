@@ -2,7 +2,10 @@
 
 Manage wireless access points in Android.
 
-Features:
+Works on any device that supports them. Requires Android 2.2 since the WiFi
+hotspot functionality was added in that version.
+
+### Features
 
  * Enabling and disabling your AP
  * Configuring your AP via `WifiConfiguration`
