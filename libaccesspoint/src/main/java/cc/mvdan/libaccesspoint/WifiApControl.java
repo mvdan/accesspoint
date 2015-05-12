@@ -268,7 +268,7 @@ public class WifiApControl {
 			String line;
 			while ((line = br.readLine()) != null) {
 				final String[] parts = line.split(" +");
-				if (parts == null || parts.length < 6) {
+				if (parts.length < 6) {
 					continue;
 				}
 
