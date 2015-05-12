@@ -101,7 +101,7 @@ public class MainActivity extends Activity {
 			sb.append(addr.toString()).append('\n');
 		}
 		final List<WifiApControl.Client> clients = apControl.getClients();
-		sb.append("Clients: ");
+		sb.append("All clients: ");
 		if (clients == null) {
 			sb.append("null\n");
 		} else if (clients.size() == 0) {
@@ -109,6 +109,18 @@ public class MainActivity extends Activity {
 		} else {
 			sb.append('\n');
 			for (final WifiApControl.Client c : clients) {
+				sb.append("   ").append(c.IPAddr).append(" ").append(c.HWAddr).append('\n');
+			}
+		}
+		final List<WifiApControl.Client> reachable = apControl.getReachableClientsList(300);
+		sb.append("Reachable clients: ");
+		if (reachable == null) {
+			sb.append("null\n");
+		} else if (reachable.size() == 0) {
+			sb.append("none\n");
+		} else {
+			sb.append('\n');
+			for (final WifiApControl.Client c : reachable) {
 				sb.append("   ").append(c.IPAddr);
 				sb.append(" ").append(c.HWAddr).append('\n');
 			}

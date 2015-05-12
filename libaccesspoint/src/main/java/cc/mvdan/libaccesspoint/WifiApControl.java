@@ -30,6 +30,11 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -308,4 +313,71 @@ public class WifiApControl {
 
 		return result;
 	}
+
+	public interface ReachableClientListener {
+		void onReachableClient(Client c);
+	}
+
+	public void getReachableClients(final ReachableClientListener listener,
+			final int timeout) {
+		final List<Client> clients = getClients();
+		if (clients == null) {
+			return;
+		}
+		final ExecutorService es = Executors.newCachedThreadPool();
+		for (final Client c : clients) {
+			es.submit(new Runnable() {
+				public void run() {
+					try {
+						final InetAddress ip = InetAddress.getByName(c.IPAddr);
+						if (ip.isReachable(timeout)) {
+							listener.onReachableClient(c);
+						}
+					} catch (IOException e) {
+						Log.e(TAG, "", e);
+					}
+				}
+			});
+		}
+	}
+
+	public List<Client> getReachableClientsList(final int timeout) {
+		final List<Client> clients = getClients();
+		if (clients == null) {
+			return null;
+		}
+		final ExecutorService es = Executors.newCachedThreadPool();
+		final List<Callable<Client>> tasks = new ArrayList<>(clients.size());
+		for (final Client c : clients) {
+			tasks.add(new Callable<Client>() {
+				public Client call() {
+					try {
+						final InetAddress ip = InetAddress.getByName(c.IPAddr);
+						if (ip.isReachable(timeout)) {
+							return c;
+						}
+					} catch (IOException e) {
+						Log.e(TAG, "", e);
+					}
+					return null;
+				}
+			});
+		}
+
+		final List<Client> result = new ArrayList<>();
+		try {
+			for (final Future<Client> answer : es.invokeAll(tasks)) {
+				final Client client = answer.get();
+				if (client == null) {
+					continue;
+				}
+				result.add(client);
+			}
+		} catch (InterruptedException | ExecutionException e) {
+			Log.e(TAG, "", e);
+			return null;
+		}
+		return result;
+	}
+
 }
