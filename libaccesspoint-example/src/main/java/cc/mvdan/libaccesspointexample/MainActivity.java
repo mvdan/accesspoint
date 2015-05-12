@@ -6,6 +6,7 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.lang.StringBuilder;
@@ -25,7 +26,7 @@ public class MainActivity extends Activity {
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		apControl = WifiApControl.getApControl(wifiManager);
 
-		final Thread t = new Thread() {
+		new Thread() {
 			@Override
 			public void run() {
 				try {
@@ -41,8 +42,7 @@ public class MainActivity extends Activity {
 				} catch (InterruptedException e) {
 				}
 			}
-		};
-		t.start();
+		}.start();
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public class MainActivity extends Activity {
 		tv.setText(sb.toString());
 	}
 
-	public void refresh(View view) {
+	public void refresh(final View view) {
 		refresh();
 	}
 
@@ -113,7 +113,24 @@ public class MainActivity extends Activity {
 		refresh();
 	}
 
-	public void enable(View view) {
+	public void enable(final View view) {
+		final Button button = (Button) view;
+		button.setEnabled(false);
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1000);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							button.setEnabled(true);
+						}
+					});
+				} catch (InterruptedException e) {
+				}
+			}
+		}.start();
 		enable();
 	}
 
@@ -123,7 +140,24 @@ public class MainActivity extends Activity {
 		refresh();
 	}
 
-	public void disable(View view) {
+	public void disable(final View view) {
+		final Button button = (Button) view;
+		button.setEnabled(false);
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(1000);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							button.setEnabled(true);
+						}
+					});
+				} catch (InterruptedException e) {
+				}
+			}
+		}.start();
 		disable();
 	}
 }
