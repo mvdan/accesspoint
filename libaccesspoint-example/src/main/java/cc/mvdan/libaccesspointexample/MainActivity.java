@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.net.InetAddress;
+import java.util.List;
 
 import cc.mvdan.libaccesspoint.WifiApControl;
 
@@ -95,9 +96,25 @@ public class MainActivity extends Activity {
 		final InetAddress addr = WifiApControl.getInetAddress();
 		sb.append("InetAddress: ");
 		if (addr == null) {
-			sb.append("null");
+			sb.append("null\n");
 		} else {
-			sb.append(addr.toString());
+			sb.append(addr.toString()).append('\n');
+		}
+		final List<WifiApControl.Client> clients = apControl.getClients();
+		sb.append("Clients: ");
+		if (clients == null) {
+			sb.append("null\n");
+		} else if (clients.size() == 0) {
+			sb.append("none\n");
+		} else {
+			sb.append('\n');
+			for (final WifiApControl.Client c : clients) {
+				sb.append("   ").append(c.IPAddr);
+				sb.append(" ").append(c.HWAddr).append('\n');
+			}
+		}
+		if (sb.length() > 0) {
+			sb.setLength(sb.length() - 1);
 		}
 		tv.setText(sb.toString());
 	}
