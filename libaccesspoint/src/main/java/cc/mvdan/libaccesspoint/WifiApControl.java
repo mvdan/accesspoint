@@ -20,11 +20,17 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.util.Log;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.regex.Pattern;
 
 public class WifiApControl {
 
@@ -186,5 +192,61 @@ public class WifiApControl {
 			Log.e(TAG, "", e);
 		}
 		return resAddr;
+	}
+
+	public static class Client {
+		public String IPAddr;
+		public String HWAddr;
+
+		public Client(String IPAddr, String HWAddr) {
+			this.IPAddr = IPAddr;
+			this.HWAddr = HWAddr;
+		}
+	}
+
+	public List<Client> getClients() {
+		if (!isEnabled()) {
+			return null;
+		}
+		final List<Client> result = new ArrayList<Client>();
+
+		// Basic sanity checks
+		final Pattern macPattern = Pattern.compile("..:..:..:..:..:..");
+
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new FileReader("/proc/net/arp"));
+			String line;
+			while ((line = br.readLine()) != null) {
+				final String[] parts = line.split(" +");
+				if (parts == null || parts.length < 6) {
+					continue;
+				}
+
+				final String IPAddr = parts[0];
+				final String HWAddr = parts[3];
+				final String Device = parts[5];
+
+				if (!Device.equals("wlan0")) {
+					continue;
+				}
+
+				if (!macPattern.matcher(parts[3]).find()) {
+					continue;
+				}
+
+				result.add(new Client(IPAddr, HWAddr));
+			}
+		} catch (Exception e) {
+			Log.e(TAG, "", e);
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				Log.e(TAG, "", e);
+			}
+		}
+
+		return result;
 	}
 }
