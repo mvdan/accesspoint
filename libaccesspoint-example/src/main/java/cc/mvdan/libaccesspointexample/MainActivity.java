@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		apControl = WifiApControl.getApControl(wifiManager);
+		apControl = WifiApControl.getInstance(this);
 
 		new Thread() {
 			@Override

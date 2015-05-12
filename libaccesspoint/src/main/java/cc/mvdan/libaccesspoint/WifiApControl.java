@@ -16,6 +16,7 @@
 
 package cc.mvdan.libaccesspoint;
 
+import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -100,18 +101,18 @@ public class WifiApControl {
 	private final WifiManager wm;
 	private final String wifiDevice;
 
-	private WifiApControl(WifiManager wm, String wifiDevice) {
-		this.wm = wm;
-		this.wifiDevice = wifiDevice;
+	private static WifiApControl instance = null;
+
+	private WifiApControl(final Context context) {
+		wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		wifiDevice = getWifiDeviceName(wm);
 	}
 
-	public static WifiApControl getApControl(WifiManager wm) {
-		if (!isSupported()) {
-			return null;
+	public static WifiApControl getInstance(final Context context) {
+		if (instance == null) {
+			instance = new WifiApControl(context);
 		}
-
-		final String wifiDevice = getWifiDeviceName(wm);
-		return new WifiApControl(wm, wifiDevice);
+		return instance;
 	}
 
 	private static String getWifiDeviceName(final WifiManager wifiManager) {
@@ -148,7 +149,7 @@ public class WifiApControl {
 		return fallbackWifiDevice;
 	}
 
-	static private byte[] macAddressToByteArray(final String macString) {
+	private static byte[] macAddressToByteArray(final String macString) {
 		final String[] mac = macString.split("[:\\s-]");
 		final byte[] macAddress = new byte[6];
 		for (int i = 0; i < mac.length; i++) {
