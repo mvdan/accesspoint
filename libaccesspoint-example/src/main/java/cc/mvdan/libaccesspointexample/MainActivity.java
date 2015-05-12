@@ -83,14 +83,14 @@ public class MainActivity extends Activity {
 		} else {
 			sb.append("NO\n");
 		}
-		final WifiConfiguration wifiConfig = apControl.getConfiguration();
+		final WifiConfiguration config = apControl.getConfiguration();
 		sb.append("WifiConfiguration:");
-		if (wifiConfig == null) {
+		if (config == null) {
 			sb.append(" null\n");
 		} else {
 			sb.append("\n");
-			sb.append("   SSID: \"").append(wifiConfig.SSID).append("\"\n");
-			sb.append("   preSharedKey: \"").append(wifiConfig.preSharedKey).append("\"\n");
+			sb.append("   SSID: \"").append(config.SSID).append("\"\n");
+			sb.append("   preSharedKey: \"").append(config.preSharedKey).append("\"\n");
 		}
 		final InetAddress addr = WifiApControl.getInetAddress();
 		sb.append("InetAddress: ");
