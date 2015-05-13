@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package cc.mvdan.libaccesspoint;
+package cc.mvdan.accesspoint;
 
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;

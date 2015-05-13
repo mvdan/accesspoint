@@ -1,4 +1,4 @@
-# libaccesspoint
+# accesspoint
 
 Manage wireless access points in Android.
 

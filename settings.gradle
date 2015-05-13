@@ -1,2 +1,2 @@
-include ':libaccesspoint'
-include ':libaccesspoint-example'
+include ':library'
+include ':example'

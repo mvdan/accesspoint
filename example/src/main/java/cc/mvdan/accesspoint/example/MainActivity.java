@@ -1,4 +1,4 @@
-package cc.mvdan.libaccesspointexample;
+package cc.mvdan.accesspoint.example;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.net.InetAddress;
 import java.util.List;
 
-import cc.mvdan.libaccesspoint.WifiApControl;
+import cc.mvdan.accesspoint.WifiApControl;
 
 public class MainActivity extends Activity {
 
