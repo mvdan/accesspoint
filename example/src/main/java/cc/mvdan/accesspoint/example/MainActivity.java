@@ -9,7 +9,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.net.InetAddress;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.util.List;
 
 import cc.mvdan.accesspoint.WifiApControl;
@@ -94,13 +95,18 @@ public class MainActivity extends Activity {
 			sb.append("   SSID: \"").append(config.SSID).append("\"\n");
 			sb.append("   preSharedKey: \"").append(config.preSharedKey).append("\"\n");
 		}
-		final InetAddress addr = apControl.getInetAddress();
-		sb.append("InetAddress: ");
-		if (addr == null) {
-			sb.append("null\n");
-		} else {
-			sb.append(addr.toString()).append('\n');
-		}
+
+		Inet4Address addr4 = apControl.getInet4Address();
+		sb.append("Inet4Address:\n   ");
+		sb.append(addr4 == null ? "null" : addr4.toString()).append('\n');
+
+		Inet6Address addr6 = apControl.getInet6Address();
+		sb.append("Inet6Address:\n   ");
+		sb.append(addr6 == null ? "null" : addr6.toString()).append('\n');
+
+		sb.append("MAC: ");
+		sb.append(wifiManager.getConnectionInfo().getMacAddress()).append('\n');
+
 		final List<WifiApControl.Client> clients = apControl.getClients();
 		sb.append("All clients: ");
 		if (clients == null) {

@@ -18,7 +18,6 @@ package cc.mvdan.accesspoint;
 
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.util.Log;
@@ -27,17 +26,19 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.Enumeration;
-import java.util.List;
 import java.util.regex.Pattern;
 
 // WifiApControl provides control over Wi-Fi APs using the singleton pattern.
@@ -135,23 +136,16 @@ public class WifiApControl {
 			return fallbackWifiDevice;
 		}
 
-		final WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-		final String wifiMacString = wifiInfo.getMacAddress();
+		String wifiMacString = wifiManager.getConnectionInfo().getMacAddress();
 		final byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
-		final BigInteger wifiMac = new BigInteger(wifiMacBytes);
 
 		try {
 			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 			while (ifaces.hasMoreElements()) {
 				NetworkInterface iface = ifaces.nextElement();
 
-				final byte[] hardwareAddress = iface.getHardwareAddress();
-				if (hardwareAddress == null) {
-					continue;
-				}
-
-				final BigInteger currentMac = new BigInteger(hardwareAddress);
-				if (currentMac.equals(wifiMac)) {
+				byte[] hardwareAddress = iface.getHardwareAddress();
+				if (hardwareAddress != null && Arrays.equals(wifiMacBytes, hardwareAddress)) {
 					return iface.getName();
 				}
 			}
@@ -255,34 +249,44 @@ public class WifiApControl {
 		return setWifiApEnabled(null, false);
 	}
 
-	// getInetAddress returns the IP address that the device has in its
+	// getInet6Address returns the IPv6 address that the device has in its
 	// own Wi-Fi AP local network. Will return null if no Wi-Fi AP is
 	// currently enabled.
-	public InetAddress getInetAddress() {
+	public Inet6Address getInet6Address() {
 		if (!isEnabled()) {
 			return null;
 		}
+		return getInetAddress(Inet6Address.class);
+	}
 
+	// getInet4Address returns the IPv4 address that the device has in its
+	// own Wi-Fi AP local network. Will return null if no Wi-Fi AP is
+	// currently enabled.
+	public Inet4Address getInet4Address() {
+		if (!isEnabled()) {
+			return null;
+		}
+		return getInetAddress(Inet4Address.class);
+	}
+
+
+	private <T extends InetAddress> T getInetAddress(Class<T> addressType) {
 		try {
 			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
 			while (ifaces.hasMoreElements()) {
 				NetworkInterface iface = ifaces.nextElement();
 
-				Enumeration<InetAddress> addrs = iface.getInetAddresses();
-				while (addrs.hasMoreElements()) {
-					InetAddress addr = addrs.nextElement();
+				if (iface.getName().equals(wifiDevice)) {
+					Enumeration<InetAddress> addrs = iface.getInetAddresses();
 
-					if (addr.isLoopbackAddress()) {
-						continue;
-					}
-
-					final String ifaceName = iface.getDisplayName();
-					if (ifaceName.contains(wifiDevice)) {
-						return addr;
+					while (addrs.hasMoreElements()) {
+						InetAddress addr = addrs.nextElement();
+						if (addressType.isInstance(addr)) {
+							return addressType.cast(addr);
+						}
 					}
 				}
 			}
-
 		} catch (IOException e) {
 			Log.e(TAG, "", e);
 		}
