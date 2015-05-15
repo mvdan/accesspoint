@@ -16,6 +16,7 @@
 
 package cc.mvdan.accesspoint;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -130,8 +131,9 @@ public class WifiApControl {
 		return instance;
 	}
 
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	private static String getWifiDeviceName(final WifiManager wifiManager) {
-		if (Build.VERSION.SDK_INT < 9) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
 			Log.w(TAG, "Older device - falling back to the default wifi device name: " + fallbackWifiDevice);
 			return fallbackWifiDevice;
 		}
