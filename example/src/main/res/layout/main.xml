@@ -5,12 +5,20 @@
 	android:orientation="vertical"
 	android:padding="8dp"
 	>
+
 	<TextView
+		android:id="@+id/apinfo"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:id="@+id/text1"
 		android:textSize="16sp"
 		/>
+
+	<ListView
+		android:id="@+id/clientlist"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		/>
+
 	<Button
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -18,6 +26,7 @@
 		android:onClick="refresh"
 		android:layout_margin="4dp"
 		/>
+
 	<Button
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -25,6 +34,7 @@
 		android:onClick="enable"
 		android:layout_margin="4dp"
 		/>
+
 	<Button
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
@@ -32,4 +42,5 @@
 		android:onClick="disable"
 		android:layout_margin="4dp"
 		/>
+
 </LinearLayout>

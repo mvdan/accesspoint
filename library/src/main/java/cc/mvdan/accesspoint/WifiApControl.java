@@ -35,11 +35,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
 // WifiApControl provides control over Wi-Fi APs using the singleton pattern.
@@ -110,14 +108,14 @@ public class WifiApControl {
 
 	private static WifiApControl instance = null;
 
-	private WifiApControl(final Context context) {
+	private WifiApControl(Context context) {
 		wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		wifiDevice = getWifiDeviceName(wm);
 	}
 
 	// getInstance is a standard singleton instance getter, constructing
 	// the actual class when first called.
-	public static WifiApControl getInstance(final Context context) {
+	public static WifiApControl getInstance(Context context) {
 		if (instance == null) {
 			instance = new WifiApControl(context);
 		}
@@ -132,14 +130,14 @@ public class WifiApControl {
 	}
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	private static String getWifiDeviceName(final WifiManager wifiManager) {
+	private static String getWifiDeviceName(WifiManager wifiManager) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
 			Log.w(TAG, "Older device - falling back to the default wifi device name: " + fallbackWifiDevice);
 			return fallbackWifiDevice;
 		}
 
 		String wifiMacString = wifiManager.getConnectionInfo().getMacAddress();
-		final byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
+		byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
 
 		try {
 			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
@@ -159,9 +157,9 @@ public class WifiApControl {
 		return fallbackWifiDevice;
 	}
 
-	private static byte[] macAddressToByteArray(final String macString) {
-		final String[] mac = macString.split("[:\\s-]");
-		final byte[] macAddress = new byte[6];
+	private static byte[] macAddressToByteArray(String macString) {
+		String[] mac = macString.split("[:\\s-]");
+		byte[] macAddress = new byte[6];
 		for (int i = 0; i < mac.length; i++) {
 			macAddress[i] = Integer.decode("0x" + mac[i]).byteValue();
 		}
@@ -320,24 +318,24 @@ public class WifiApControl {
 		if (!isEnabled()) {
 			return null;
 		}
-		final List<Client> result = new ArrayList<>();
+		List<Client> result = new ArrayList<>();
 
 		// Basic sanity checks
-		final Pattern macPattern = Pattern.compile("..:..:..:..:..:..");
+		Pattern macPattern = Pattern.compile("..:..:..:..:..:..");
 
 		BufferedReader br = null;
 		try {
 			br = new BufferedReader(new FileReader("/proc/net/arp"));
 			String line;
 			while ((line = br.readLine()) != null) {
-				final String[] parts = line.split(" +");
+				String[] parts = line.split(" +");
 				if (parts.length < 6) {
 					continue;
 				}
 
-				final String IPAddr = parts[0];
-				final String HWAddr = parts[3];
-				final String device = parts[5];
+				String IPAddr = parts[0];
+				String HWAddr = parts[3];
+				String device = parts[5];
 
 				if (!device.equals(wifiDevice)) {
 					continue;
@@ -368,79 +366,55 @@ public class WifiApControl {
 	// provided by getReachableClients via callbacks.
 	public interface ReachableClientListener {
 
-		// Function called each time a reachable client is found.
+		// onReachableClient is called each time a reachable client is
+		// found.
 		void onReachableClient(Client c);
+
+		// onComplete is called when we are done looking for reachable
+		// clients
+		void onComplete();
 	}
 
 	// getReachableClients fetches the clients connected to the network
 	// much like getClients, but only those which are reachable. Since
-	// checking for reachability requires network I/O, the results are
-	// provided via callbacks.
-	public void getReachableClients(final ReachableClientListener listener,
-			final int timeout) {
-		final List<Client> clients = getClients();
+	// checking for reachability requires network I/O, the reachable
+	// clients are returned via callbacks. All the clients are returned
+	// like in getClients so that the callback returns a subset of the
+	// same objects.
+	public List<Client> getReachableClients(final int timeout,
+			final ReachableClientListener listener) {
+		List<Client> clients = getClients();
 		if (clients == null) {
-			return;
+			return null;
 		}
-		final ExecutorService es = Executors.newCachedThreadPool();
+		final CountDownLatch latch = new CountDownLatch(clients.size());
+		ExecutorService es = Executors.newCachedThreadPool();
 		for (final Client c : clients) {
 			es.submit(new Runnable() {
 				public void run() {
 					try {
-						final InetAddress ip = InetAddress.getByName(c.IPAddr);
+						InetAddress ip = InetAddress.getByName(c.IPAddr);
 						if (ip.isReachable(timeout)) {
 							listener.onReachableClient(c);
 						}
 					} catch (IOException e) {
 						Log.e(TAG, "", e);
 					}
+					latch.countDown();
 				}
 			});
 		}
-	}
-
-	// getReachableClients returns a list of the clients connected to the
-	// network which are reachable. Like getReachableClients, but the
-	// function doesn't return until all tasks are done and it returns the
-	// results all in one. Easier to use, but beware of blocking your UI
-	// thread.
-	public List<Client> getReachableClientsList(final int timeout) {
-		final List<Client> clients = getClients();
-		if (clients == null) {
-			return null;
-		}
-		final ExecutorService es = Executors.newCachedThreadPool();
-		final List<Callable<Client>> tasks = new ArrayList<>(clients.size());
-		for (final Client c : clients) {
-			tasks.add(new Callable<Client>() {
-				public Client call() {
-					try {
-						final InetAddress ip = InetAddress.getByName(c.IPAddr);
-						if (ip.isReachable(timeout)) {
-							return c;
-						}
-					} catch (IOException e) {
-						Log.e(TAG, "", e);
-					}
-					return null;
+		new Thread() {
+			public void run() {
+				try {
+					latch.await();
+				} catch (InterruptedException e) {
+					Log.e(TAG, "", e);
 				}
-			});
-		}
-
-		final List<Client> result = new ArrayList<>();
-		try {
-			for (final Future<Client> answer : es.invokeAll(tasks)) {
-				final Client client = answer.get();
-				if (client == null) {
-					continue;
-				}
-				result.add(client);
+				listener.onComplete();
 			}
-		} catch (InterruptedException | ExecutionException e) {
-			Log.e(TAG, "", e);
-			return null;
-		}
-		return result;
+		}.start();
+		return clients;
 	}
 
 }

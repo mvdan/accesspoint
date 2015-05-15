@@ -21,25 +21,38 @@ import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.util.ArrayList;
 import java.util.List;
 
 import cc.mvdan.accesspoint.WifiApControl;
+import cc.mvdan.accesspoint.WifiApControl.Client;
+import cc.mvdan.accesspoint.WifiApControl.ReachableClientListener;
 
 public class MainActivity extends Activity {
 
 	private WifiManager wifiManager;
 	private WifiApControl apControl;
+	private ClientArrayAdapter adapter;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
+
+		adapter = new ClientArrayAdapter(this, new ArrayList<Client>());
+		ListView listView = (ListView) findViewById(R.id.clientlist);
+		listView.setAdapter(adapter);
+
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 		apControl = WifiApControl.getInstance(this);
 
@@ -69,7 +82,7 @@ public class MainActivity extends Activity {
 		refresh();
 	}
 
-	private static String stateString(final int state) {
+	private static String stateString(int state) {
 		switch (state) {
 			case WifiApControl.STATE_FAILED:
 				return "FAILED";
@@ -86,20 +99,22 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private void refresh() {
-		final TextView tv = (TextView) findViewById(R.id.text1);
-		final StringBuilder sb = new StringBuilder();
+	private void updateText() {
+		StringBuilder sb = new StringBuilder();
+
 		if (!WifiApControl.isSupported()) {
 			sb.append("Warning: Wifi AP mode not supported!\n");
 			sb.append("You should get unknown or zero values below.\n");
 			sb.append("If you don't, isSupported() is probably buggy!\n");
 		}
-		final int state = apControl.getState();
+
+		int state = apControl.getState();
 		sb.append("State: ").append(stateString(state)).append('\n');
-		final boolean enabled = apControl.isEnabled();
+
+		boolean enabled = apControl.isEnabled();
 		sb.append("Enabled: ").append(enabled ? "YES" : "NO").append('\n');
 
-		final WifiConfiguration config = apControl.getConfiguration();
+		WifiConfiguration config = apControl.getConfiguration();
 		sb.append("WifiConfiguration:");
 		if (config == null) {
 			sb.append(" null\n");
@@ -120,41 +135,96 @@ public class MainActivity extends Activity {
 		sb.append("MAC: ");
 		sb.append(wifiManager.getConnectionInfo().getMacAddress()).append('\n');
 
-		final List<WifiApControl.Client> clients = apControl.getClients();
-		sb.append("All clients: ");
-		if (clients == null) {
-			sb.append("null\n");
-		} else if (clients.size() == 0) {
-			sb.append("none\n");
-		} else {
-			sb.append('\n');
-			for (final WifiApControl.Client c : clients) {
-				sb.append("   ").append(c.IPAddr).append(" ").append(c.HWAddr).append('\n');
-			}
-		}
-		final List<WifiApControl.Client> reachable = apControl.getReachableClientsList(300);
-		sb.append("Reachable clients: ");
-		if (reachable == null) {
-			sb.append("null\n");
-		} else if (reachable.size() == 0) {
-			sb.append("none\n");
-		} else {
-			sb.append('\n');
-			for (final WifiApControl.Client c : reachable) {
-				sb.append("   ").append(c.IPAddr).append(" ").append(c.HWAddr).append('\n');
-			}
-		}
-		if (sb.length() > 0) {
-			sb.setLength(sb.length() - 1);
-		}
+		TextView tv = (TextView) findViewById(R.id.apinfo);
 		tv.setText(sb.toString());
 	}
 
-	public void refresh(final View view) {
+	private class ClientArrayAdapter extends ArrayAdapter<Client> {
+
+		private boolean[] reachable;
+
+		public ClientArrayAdapter(Context context, List<Client> clients) {
+			super(context, 0, clients);
+			this.reachable = new boolean[clients.size()];
+		}
+
+		public void setClients(List<Client> clients) {
+			clear();
+			if (clients != null) {
+				addAll(clients);
+				reachable = new boolean[clients.size()];
+			}
+			notifyDataSetChanged();
+		}
+
+		public void setReachable(Client client) {
+			int position = getPosition(client);
+			if (position < 0) {
+				return;
+			}
+			reachable[position] = true;
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public View getView(int position, View view, ViewGroup parent) {
+			ViewHolder holder = null;
+
+			if (view == null) {
+				LayoutInflater inflater = LayoutInflater.from(getContext());
+				view = inflater.inflate(R.layout.clientlistitem, parent, false);
+
+				holder = new ViewHolder();
+				holder.desc = (TextView) view.findViewById(R.id.client_desc);
+				holder.reach = (TextView) view.findViewById(R.id.client_reach);
+
+				view.setTag(holder);
+			} else {
+				holder = (ViewHolder) view.getTag();
+			}
+
+			Client client = getItem(position);
+			holder.desc.setText(client.IPAddr + " " + client.HWAddr);
+			holder.reach.setText(reachable[position] ? "R" : "");
+
+			return view;
+		}
+
+		private class ViewHolder {
+			TextView desc;
+			TextView reach;
+		}
+
+	}
+
+	private void listClients(int timeout) {
+		List<Client> clients = apControl.getReachableClients(timeout,
+				new ReachableClientListener() {
+			public void onReachableClient(final Client client) {
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						adapter.setReachable(client);
+					}
+				});
+			}
+			public void onComplete() {
+			}
+		});
+		adapter.setClients(clients);
+	}
+
+
+	private void refresh() {
+		updateText();
+		listClients(300);
+	}
+
+	public void refresh(View view) {
 		refresh();
 	}
 
-	public void enable() {
+	private void enable() {
 		wifiManager.setWifiEnabled(false);
 		apControl.enable();
 		refresh();
@@ -179,21 +249,21 @@ public class MainActivity extends Activity {
 		}.start();
 	}
 
-	public void enable(final View view) {
-		final Button button = (Button) view;
+	public void enable(View view) {
+		Button button = (Button) view;
 		button.setEnabled(false);
 		enable();
 		enableButtonAfter(button, 1000);
 	}
 
-	public void disable() {
+	private void disable() {
 		apControl.disable();
 		wifiManager.setWifiEnabled(true);
 		refresh();
 	}
 
-	public void disable(final View view) {
-		final Button button = (Button) view;
+	public void disable(View view) {
+		Button button = (Button) view;
 		button.setEnabled(false);
 		disable();
 		enableButtonAfter(button, 1000);
