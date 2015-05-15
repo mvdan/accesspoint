@@ -20,6 +20,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import android.widget.TextView;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import cc.mvdan.accesspoint.WifiApControl;
@@ -148,10 +150,20 @@ public class MainActivity extends Activity {
 			this.reachable = new boolean[clients.size()];
 		}
 
+		private void compatAddAll(Collection<Client> clients) {
+			if (Build.VERSION.SDK_INT < 11) {
+				for (Client client : clients) {
+					add(client);
+				}
+			} else {
+				addAll(clients);
+			}
+		}
+
 		public void setClients(List<Client> clients) {
 			clear();
 			if (clients != null) {
-				addAll(clients);
+				compatAddAll(clients);
 				reachable = new boolean[clients.size()];
 			}
 			notifyDataSetChanged();
