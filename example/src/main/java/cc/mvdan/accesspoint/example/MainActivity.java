@@ -80,12 +80,9 @@ public class MainActivity extends Activity {
 		}
 		final int state = apControl.getState();
 		sb.append("State: ").append(stateString(state)).append('\n');
-		sb.append("Enabled: ");
-		if (apControl.isEnabled()) {
-			sb.append("YES\n");
-		} else {
-			sb.append("NO\n");
-		}
+		final boolean enabled = apControl.isEnabled();
+		sb.append("Enabled: ").append(enabled ? "YES" : "NO").append('\n');
+
 		final WifiConfiguration config = apControl.getConfiguration();
 		sb.append("WifiConfiguration:");
 		if (config == null) {
@@ -97,11 +94,11 @@ public class MainActivity extends Activity {
 		}
 
 		Inet4Address addr4 = apControl.getInet4Address();
-		sb.append("Inet4Address:\n   ");
+		sb.append("Inet4Address: ");
 		sb.append(addr4 == null ? "null" : addr4.toString()).append('\n');
 
 		Inet6Address addr6 = apControl.getInet6Address();
-		sb.append("Inet6Address:\n   ");
+		sb.append("Inet6Address: ");
 		sb.append(addr6 == null ? "null" : addr6.toString()).append('\n');
 
 		sb.append("MAC: ");

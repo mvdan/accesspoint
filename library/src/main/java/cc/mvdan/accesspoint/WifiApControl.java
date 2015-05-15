@@ -276,14 +276,16 @@ public class WifiApControl {
 			while (ifaces.hasMoreElements()) {
 				NetworkInterface iface = ifaces.nextElement();
 
-				if (iface.getName().equals(wifiDevice)) {
-					Enumeration<InetAddress> addrs = iface.getInetAddresses();
+				if (!iface.getName().equals(wifiDevice)) {
+					continue;
+				}
 
-					while (addrs.hasMoreElements()) {
-						InetAddress addr = addrs.nextElement();
-						if (addressType.isInstance(addr)) {
-							return addressType.cast(addr);
-						}
+				Enumeration<InetAddress> addrs = iface.getInetAddresses();
+				while (addrs.hasMoreElements()) {
+					InetAddress addr = addrs.nextElement();
+
+					if (addressType.isInstance(addr)) {
+						return addressType.cast(addr);
 					}
 				}
 			}
