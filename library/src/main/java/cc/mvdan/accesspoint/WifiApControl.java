@@ -301,10 +301,10 @@ public class WifiApControl {
 	public static class Client {
 
 		// IPAddr is the raw string of the IP Address client
-		public String IPAddr;
+		public final String IPAddr;
 
 		// HWAddr is the raw string of the MAC of the client
-		public String HWAddr;
+		public final String HWAddr;
 
 		public Client(String IPAddr, String HWAddr) {
 			this.IPAddr = IPAddr;
