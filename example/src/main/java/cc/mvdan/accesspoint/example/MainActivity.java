@@ -86,18 +86,18 @@ public class MainActivity extends Activity {
 
 	private static String stateString(int state) {
 		switch (state) {
-			case WifiApControl.STATE_FAILED:
-				return "FAILED";
-			case WifiApControl.STATE_DISABLED:
-				return "DISABLED";
-			case WifiApControl.STATE_DISABLING:
-				return "DISABLING";
-			case WifiApControl.STATE_ENABLED:
-				return "ENABLED";
-			case WifiApControl.STATE_ENABLING:
-				return "ENABLING";
-			default:
-				return "UNKNOWN!";
+		case WifiApControl.STATE_FAILED:
+			return "FAILED";
+		case WifiApControl.STATE_DISABLED:
+			return "DISABLED";
+		case WifiApControl.STATE_DISABLING:
+			return "DISABLING";
+		case WifiApControl.STATE_ENABLED:
+			return "ENABLED";
+		case WifiApControl.STATE_ENABLING:
+			return "ENABLING";
+		default:
+			return "UNKNOWN!";
 		}
 	}
 
@@ -180,7 +180,7 @@ public class MainActivity extends Activity {
 
 		@Override
 		public View getView(int position, View view, ViewGroup parent) {
-			ViewHolder holder = null;
+			ViewHolder holder;
 
 			if (view == null) {
 				LayoutInflater inflater = LayoutInflater.from(getContext());

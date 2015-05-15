@@ -42,8 +42,8 @@ import java.util.regex.Pattern;
 
 // WifiApControl provides control over Wi-Fi APs using the singleton pattern.
 // Even though isSupported should be reliable, the underlying hidden APIs that
-// are obtained via reflection to provide the main functionalities may not
-// work as expected.
+// are obtained via reflection to provide the main features may not work as
+// expected.
 public class WifiApControl {
 
 	private static final String TAG = "WifiApControl";
