@@ -20,3 +20,6 @@ android {
 		}
 	}
 }
+
+version = "0.1.0"
+group = "cc.mvdan.accesspoint"
