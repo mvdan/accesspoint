@@ -5,6 +5,28 @@ Manage wireless access points in Android.
 Works on any device that supports them. Requires Android 2.2 since the WiFi
 hotspot functionality was added in that version.
 
+### Quick start
+
+```java
+WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+WifiApControl apControl = WifiApControl.getInstance(context);
+
+boolean enabled = apControl.isEnabled();
+int state = apControl.getState();
+
+WifiConfiguration config = apControl.getConfiguration();
+Inet4Address addr4 = apControl.getInet4Address();
+Inet6Address addr6 = apControl.getInet6Address();
+
+List<WifiApControl.Client> clients = apControl.getClients()
+
+wifiManager.setWifiEnabled(false);
+apControl.enable();
+
+apControl.disable();
+wifiManager.setWifiEnabled(true);
+```
+
 ### Features
 
  * Enabling and disabling your AP
@@ -16,10 +38,12 @@ hotspot functionality was added in that version.
 
 You will need the following:
 
-	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-	<uses-permission android:name="android.permission.INTERNET"/>
+```xml
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+<uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+<uses-permission android:name="android.permission.INTERNET"/>
+```
 
 ### How does it work?
 
