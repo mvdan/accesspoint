@@ -1,9 +1,6 @@
 # accesspoint
 
-Manage wireless access points in Android.
-
-Works on any device that supports them. Requires Android 2.2 since the WiFi
-hotspot functionality was added in that version.
+Manage wireless access points on Android 2.2 or later.
 
 ### Quick start
 
@@ -56,6 +53,10 @@ associated with the wireless network interface.
 
 Getting the list of clients consists of parsing `/proc/net/arp` and parsing
 each line to see what devices are neighbours in our wireless network.
+
+An extra method is available to get the list of reachable clients, since the
+arp table is cached for up to a few minutes. The method asynchronously tests
+the reachability of each client.
 
 ### License
 
