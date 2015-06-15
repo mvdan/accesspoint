@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 
 android {
 	compileSdkVersion 22
@@ -22,4 +24,55 @@ android {
 }
 
 version = "0.1.0"
-group = "cc.mvdan.accesspoint"
+group = "cc.mvdan"
+artifact = "accesspoint"
+
+bintray {
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_KEY')
+
+	configurations = ['archives']
+	dryRun = false
+	publish = true
+	pkg {
+		repo = 'maven'
+		name = 'accesspoint'
+	}
+
+}
+
+install {
+	repositories.mavenInstaller {
+		pom {
+			project {
+				packaging 'aar'
+				name 'accesspoint'
+				url 'https://github.com/mvdan/accesspoint'
+			}
+		}
+	}
+}
+
+task sourcesJar(type: Jar) {
+	from android.sourceSets.main.java.srcDirs
+	classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+	source = android.sourceSets.main.java.srcDirs
+	classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+	classifier = 'javadoc'
+	from javadoc.destinationDir
+}
+
+artifacts {
+	archives javadocJar
+	archives sourcesJar
+}
+
+task findConventions << {
+	println project.getConvention()
+}
