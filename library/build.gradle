@@ -23,9 +23,8 @@ android {
 	}
 }
 
+group = "cc.mvdan.accesspoint"
 version = "0.1.0"
-group = "cc.mvdan"
-artifact = "accesspoint"
 
 bintray {
 	user = System.getenv('BINTRAY_USER')
@@ -58,21 +57,6 @@ task sourcesJar(type: Jar) {
 	classifier = 'sources'
 }
 
-task javadoc(type: Javadoc) {
-	source = android.sourceSets.main.java.srcDirs
-	classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
-}
-
 artifacts {
-	archives javadocJar
 	archives sourcesJar
-}
-
-task findConventions << {
-	println project.getConvention()
 }
