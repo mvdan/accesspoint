@@ -299,10 +299,10 @@ public class WifiApControl {
 	public static class Client {
 
 		// IPAddr is the raw string of the IP Address client
-		public final String IPAddr;
+		public String IPAddr;
 
 		// HWAddr is the raw string of the MAC of the client
-		public final String HWAddr;
+		public String HWAddr;
 
 		public Client(String IPAddr, String HWAddr) {
 			this.IPAddr = IPAddr;
