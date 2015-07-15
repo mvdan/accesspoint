@@ -15,6 +15,8 @@ WifiConfiguration config = apControl.getConfiguration();
 Inet4Address addr4 = apControl.getInet4Address();
 Inet6Address addr6 = apControl.getInet6Address();
 
+// These are cached and may no longer be connected, see
+// apControl.getReachableClients(int, ReachableClientListener)
 List<WifiApControl.Client> clients = apControl.getClients()
 
 wifiManager.setWifiEnabled(false);
