@@ -24,7 +24,7 @@ android {
 }
 
 group = "cc.mvdan.accesspoint"
-version = "0.1.0"
+version = "0.1.1"
 
 bintray {
 	user = System.getenv('BINTRAY_USER')
