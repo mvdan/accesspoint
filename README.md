@@ -4,7 +4,19 @@ Manage wireless access points on Android 2.2 or later.
 
 ### Quick start
 
+```gradle
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'cc.mvdan.accesspoint:library:0.1.0'
+}
+```
+
 ```java
+import cc.mvdan.accesspoint.WifiApControl;
+
 WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
 WifiApControl apControl = WifiApControl.getInstance(context);
 
