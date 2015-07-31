@@ -1,5 +1,7 @@
 # accesspoint
 
+[![Build Status](https://travis-ci.org/mvdan/accesspoint.svg?branch=master)](https://travis-ci.org/mvdan/accesspoint)
+
 Manage wireless access points on Android 2.2 or later.
 
 ### Quick start
