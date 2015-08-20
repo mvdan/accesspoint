@@ -122,13 +122,6 @@ public class WifiApControl {
 		return instance;
 	}
 
-	// getInstance is a commodity singleton instance getter that doesn't
-	// require a context granted that it has been provided at least once
-	// before. Will return null if that is not the case.
-	public static WifiApControl getInstance() {
-		return instance;
-	}
-
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	private static String getWifiDeviceName(WifiManager wifiManager) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
