@@ -164,7 +164,7 @@ final public class WifiApControl {
 		return macAddress;
 	}
 
-	private Object invokeQuietly(Method method, Object receiver, Object... args) {
+	private static Object invokeQuietly(Method method, Object receiver, Object... args) {
 		try {
 			return method.invoke(receiver, args);
 		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
