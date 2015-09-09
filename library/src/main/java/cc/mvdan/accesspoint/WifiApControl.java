@@ -104,13 +104,13 @@ final public class WifiApControl {
 	private static final String FALLBACK_DEVICE = "wlan0";
 
 	private final WifiManager wm;
-	private final String device;
+	private final String deviceName;
 
 	private static WifiApControl instance = null;
 
 	private WifiApControl(Context context) {
 		wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-		device = getDeviceName(wm);
+		deviceName = getDeviceName(wm);
 	}
 
 	// getInstance is a standard singleton instance getter, constructing
@@ -273,7 +273,7 @@ final public class WifiApControl {
 			while (ifaces.hasMoreElements()) {
 				NetworkInterface iface = ifaces.nextElement();
 
-				if (!iface.getName().equals(device)) {
+				if (!iface.getName().equals(deviceName)) {
 					continue;
 				}
 
@@ -334,7 +334,7 @@ final public class WifiApControl {
 				String hwAddr = parts[3];
 				String device = parts[5];
 
-				if (!device.equals(device)) {
+				if (!device.equals(deviceName)) {
 					continue;
 				}
 
