@@ -8,11 +8,11 @@ Manage wireless access points on Android 2.2 or later.
 
 ```gradle
 repositories {
-    jcenter()
+	jcenter()
 }
 
 dependencies {
-    compile 'cc.mvdan.accesspoint:library:0.1.1'
+	compile 'cc.mvdan.accesspoint:library:0.1.1'
 }
 ```
 
