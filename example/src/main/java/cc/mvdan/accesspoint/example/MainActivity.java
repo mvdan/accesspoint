@@ -33,7 +33,6 @@ import android.widget.TextView;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import cc.mvdan.accesspoint.WifiApControl;
@@ -150,14 +149,14 @@ public class MainActivity extends Activity {
 			this.reachable = new boolean[clients.size()];
 		}
 
-		private void compatAddAll(Collection<Client> clients) {
+		private void compatAddAll(List<Client> clients) {
 			if (Build.VERSION.SDK_INT < 11) {
 				for (Client client : clients) {
 					add(client);
 				}
-			} else {
-				addAll(clients);
+				return;
 			}
+			addAll(clients);
 		}
 
 		public void setClients(List<Client> clients) {
