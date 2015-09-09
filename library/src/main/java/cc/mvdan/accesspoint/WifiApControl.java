@@ -130,6 +130,10 @@ public class WifiApControl {
 		}
 
 		String wifiMacString = wifiManager.getConnectionInfo().getMacAddress();
+		if (wifiMacString == null) {
+			Log.w(TAG, "MAC Address not found - Wi-Fi disabled? Falling back to the default wifi device name: " + fallbackWifiDevice);
+			return fallbackWifiDevice;
+		}
 		byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
 
 		try {
