@@ -238,12 +238,12 @@ final public class WifiApControl {
 
 	// enable starts the currently configured Wi-Fi AP.
 	public boolean enable() {
-		return setWifiApEnabled(getWifiApConfiguration(), true);
+		return setEnabled(getConfiguration(), true);
 	}
 
 	// disable stops any currently running Wi-Fi AP.
 	public boolean disable() {
-		return setWifiApEnabled(null, false);
+		return setEnabled(null, false);
 	}
 
 	// getInet6Address returns the IPv6 address that the device has in its
