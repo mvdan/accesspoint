@@ -26,6 +26,7 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -163,14 +164,22 @@ final public class WifiApControl {
 		return macAddress;
 	}
 
-	// isWifiApEnabled returns whether the Wi-Fi AP is currently enabled.
-	public boolean isWifiApEnabled() {
+	private Object invokeQuietly(Method method, Object receiver, Object... args) {
 		try {
-			return (Boolean) isWifiApEnabledMethod.invoke(wm);
-		} catch (Exception e) {
+			return method.invoke(receiver, args);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			Log.e(TAG, "", e);
 		}
-		return false;
+		return null;
+	}
+
+	// isWifiApEnabled returns whether the Wi-Fi AP is currently enabled.
+	public boolean isWifiApEnabled() {
+		Object result = invokeQuietly(isWifiApEnabledMethod, wm);
+		if (result == null) {
+			return false;
+		}
+		return (Boolean) result;
 	}
 
 	// isEnabled is a commodity function alias for isWifiApEnabled.
@@ -189,12 +198,11 @@ final public class WifiApControl {
 
 	// getWifiApState returns the current Wi-Fi AP state.
 	public int getWifiApState() {
-		try {
-			return newStateNumber((Integer) getWifiApStateMethod.invoke(wm));
-		} catch (Exception e) {
-			Log.e(TAG, "", e);
+		Object result = invokeQuietly(getWifiApStateMethod, wm);
+		if (result == null) {
+			return -1;
 		}
-		return -1;
+		return newStateNumber((Integer) result);
 	}
 
 	// getState is a commodity function alias for getWifiApState.
@@ -204,12 +212,11 @@ final public class WifiApControl {
 
 	// getWifiApConfiguration returns the current Wi-Fi AP configuration.
 	public WifiConfiguration getWifiApConfiguration() {
-		try {
-			return (WifiConfiguration) getWifiApConfigurationMethod.invoke(wm);
-		} catch (Exception e) {
-			Log.e(TAG, "", e);
+		Object result = invokeQuietly(getWifiApConfigurationMethod, wm);
+		if (result == null) {
+			return null;
 		}
-		return null;
+		return (WifiConfiguration) result;
 	}
 
 	// getConfiguration is a commodity function alias for
@@ -223,12 +230,11 @@ final public class WifiApControl {
 	// configuration. You should call WifiManager.setWifiEnabled(false)
 	// yourself before calling this method.
 	public boolean setWifiApEnabled(WifiConfiguration config, boolean enabled) {
-		try {
-			return (Boolean) setWifiApEnabledMethod.invoke(wm, config, enabled);
-		} catch (Exception e) {
-			Log.e(TAG, "", e);
+		Object result = invokeQuietly(setWifiApEnabledMethod, wm, config, enabled);
+		if (result == null) {
+			return false;
 		}
-		return false;
+		return (Boolean) result;
 	}
 
 	// setEnabled is a commodity function alias for setWifiApEnabled.
