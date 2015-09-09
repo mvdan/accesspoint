@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 // Even though isSupported should be reliable, the underlying hidden APIs that
 // are obtained via reflection to provide the main features may not work as
 // expected.
-public class WifiApControl {
+final public class WifiApControl {
 
 	private static final String TAG = "WifiApControl";
 
@@ -101,7 +101,7 @@ public class WifiApControl {
 		return isSoftwareSupported() && isHardwareSupported();
 	}
 
-	private static final String fallbackDevice = "wlan0";
+	private static final String FALLBACK_DEVICE = "wlan0";
 
 	private final WifiManager wm;
 	private final String device;
@@ -125,14 +125,14 @@ public class WifiApControl {
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	private static String getDeviceName(WifiManager wifiManager) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-			Log.w(TAG, "Older device - falling back to the default device name: " + fallbackDevice);
-			return fallbackDevice;
+			Log.w(TAG, "Older device - falling back to the default device name: " + FALLBACK_DEVICE);
+			return FALLBACK_DEVICE;
 		}
 
 		String macString = wifiManager.getConnectionInfo().getMacAddress();
 		if (macString == null) {
-			Log.w(TAG, "MAC Address not found - Wi-Fi disabled? Falling back to the default device name: " + fallbackDevice);
-			return fallbackDevice;
+			Log.w(TAG, "MAC Address not found - Wi-Fi disabled? Falling back to the default device name: " + FALLBACK_DEVICE);
+			return FALLBACK_DEVICE;
 		}
 		byte[] macBytes = macAddressToByteArray(macString);
 
@@ -150,8 +150,8 @@ public class WifiApControl {
 			Log.e(TAG, "", e);
 		}
 
-		Log.w(TAG, "None found - falling back to the default device name: " + fallbackDevice);
-		return fallbackDevice;
+		Log.w(TAG, "None found - falling back to the default device name: " + FALLBACK_DEVICE);
+		return FALLBACK_DEVICE;
 	}
 
 	private static byte[] macAddressToByteArray(String macString) {
@@ -295,15 +295,15 @@ public class WifiApControl {
 	// Client describes a Wi-Fi AP device connected to the network.
 	public static class Client {
 
-		// IPAddr is the raw string of the IP Address client
-		public String IPAddr;
+		// ipAddr is the raw string of the IP Address client
+		public String ipAddr;
 
-		// HWAddr is the raw string of the MAC of the client
-		public String HWAddr;
+		// hwAddr is the raw string of the MAC of the client
+		public String hwAddr;
 
-		public Client(String IPAddr, String HWAddr) {
-			this.IPAddr = IPAddr;
-			this.HWAddr = HWAddr;
+		public Client(String ipAddr, String hwAddr) {
+			this.ipAddr = ipAddr;
+			this.hwAddr = hwAddr;
 		}
 	}
 
@@ -330,8 +330,8 @@ public class WifiApControl {
 					continue;
 				}
 
-				String IPAddr = parts[0];
-				String HWAddr = parts[3];
+				String ipAddr = parts[0];
+				String hwAddr = parts[3];
 				String device = parts[5];
 
 				if (!device.equals(device)) {
@@ -342,7 +342,7 @@ public class WifiApControl {
 					continue;
 				}
 
-				result.add(new Client(IPAddr, HWAddr));
+				result.add(new Client(ipAddr, hwAddr));
 			}
 		} catch (IOException e) {
 			Log.e(TAG, "", e);
@@ -390,7 +390,7 @@ public class WifiApControl {
 			es.submit(new Runnable() {
 				public void run() {
 					try {
-						InetAddress ip = InetAddress.getByName(c.IPAddr);
+						InetAddress ip = InetAddress.getByName(c.ipAddr);
 						if (ip.isReachable(timeout)) {
 							listener.onReachableClient(c);
 						}

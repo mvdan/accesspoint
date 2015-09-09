@@ -196,7 +196,7 @@ public class MainActivity extends Activity {
 			}
 
 			Client client = getItem(position);
-			holder.desc.setText(client.IPAddr + " " + client.HWAddr);
+			holder.desc.setText(client.ipAddr + " " + client.hwAddr);
 			holder.reach.setText(reachable[position] ? "R" : "");
 
 			return view;
