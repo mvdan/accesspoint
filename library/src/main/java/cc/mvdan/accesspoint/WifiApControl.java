@@ -101,16 +101,16 @@ public class WifiApControl {
 		return isSoftwareSupported() && isHardwareSupported();
 	}
 
-	private static final String fallbackWifiDevice = "wlan0";
+	private static final String fallbackDevice = "wlan0";
 
 	private final WifiManager wm;
-	private final String wifiDevice;
+	private final String device;
 
 	private static WifiApControl instance = null;
 
 	private WifiApControl(Context context) {
 		wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-		wifiDevice = getWifiDeviceName(wm);
+		device = getDeviceName(wm);
 	}
 
 	// getInstance is a standard singleton instance getter, constructing
@@ -123,18 +123,18 @@ public class WifiApControl {
 	}
 
 	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
-	private static String getWifiDeviceName(WifiManager wifiManager) {
+	private static String getDeviceName(WifiManager wifiManager) {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-			Log.w(TAG, "Older device - falling back to the default wifi device name: " + fallbackWifiDevice);
-			return fallbackWifiDevice;
+			Log.w(TAG, "Older device - falling back to the default device name: " + fallbackDevice);
+			return fallbackDevice;
 		}
 
-		String wifiMacString = wifiManager.getConnectionInfo().getMacAddress();
-		if (wifiMacString == null) {
-			Log.w(TAG, "MAC Address not found - Wi-Fi disabled? Falling back to the default wifi device name: " + fallbackWifiDevice);
-			return fallbackWifiDevice;
+		String macString = wifiManager.getConnectionInfo().getMacAddress();
+		if (macString == null) {
+			Log.w(TAG, "MAC Address not found - Wi-Fi disabled? Falling back to the default device name: " + fallbackDevice);
+			return fallbackDevice;
 		}
-		byte[] wifiMacBytes = macAddressToByteArray(wifiMacString);
+		byte[] macBytes = macAddressToByteArray(macString);
 
 		try {
 			Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
@@ -142,7 +142,7 @@ public class WifiApControl {
 				NetworkInterface iface = ifaces.nextElement();
 
 				byte[] hardwareAddress = iface.getHardwareAddress();
-				if (hardwareAddress != null && Arrays.equals(wifiMacBytes, hardwareAddress)) {
+				if (hardwareAddress != null && Arrays.equals(macBytes, hardwareAddress)) {
 					return iface.getName();
 				}
 			}
@@ -150,8 +150,8 @@ public class WifiApControl {
 			Log.e(TAG, "", e);
 		}
 
-		Log.w(TAG, "None found - falling back to the default wifi device name: " + fallbackWifiDevice);
-		return fallbackWifiDevice;
+		Log.w(TAG, "None found - falling back to the default device name: " + fallbackDevice);
+		return fallbackDevice;
 	}
 
 	private static byte[] macAddressToByteArray(String macString) {
@@ -187,7 +187,7 @@ public class WifiApControl {
 		return state;
 	}
 
-	// getWifiDeviceName returns the current Wi-Fi AP state.
+	// getWifiApState returns the current Wi-Fi AP state.
 	public int getWifiApState() {
 		try {
 			return newStateNumber((Integer) getWifiApStateMethod.invoke(wm));
@@ -273,7 +273,7 @@ public class WifiApControl {
 			while (ifaces.hasMoreElements()) {
 				NetworkInterface iface = ifaces.nextElement();
 
-				if (!iface.getName().equals(wifiDevice)) {
+				if (!iface.getName().equals(device)) {
 					continue;
 				}
 
@@ -334,7 +334,7 @@ public class WifiApControl {
 				String HWAddr = parts[3];
 				String device = parts[5];
 
-				if (!device.equals(wifiDevice)) {
+				if (!device.equals(device)) {
 					continue;
 				}
 
