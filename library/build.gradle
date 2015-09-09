@@ -15,12 +15,6 @@ android {
 		sourceCompatibility JavaVersion.VERSION_1_7
 		targetCompatibility JavaVersion.VERSION_1_7
 	}
-
-	gradle.projectsEvaluated {
-		tasks.withType(JavaCompile) {
-			options.compilerArgs << "-Xlint:all"
-		}
-	}
 }
 
 group = "cc.mvdan.accesspoint"
