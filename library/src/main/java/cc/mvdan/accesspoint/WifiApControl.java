@@ -174,6 +174,8 @@ final public class WifiApControl {
 	}
 
 	// isWifiApEnabled returns whether the Wi-Fi AP is currently enabled.
+	// If an error occured invoking the method via reflection, false is
+	// returned.
 	public boolean isWifiApEnabled() {
 		Object result = invokeQuietly(isWifiApEnabledMethod, wm);
 		if (result == null) {
@@ -197,6 +199,8 @@ final public class WifiApControl {
 	}
 
 	// getWifiApState returns the current Wi-Fi AP state.
+	// If an error occured invoking the method via reflection, -1 is
+	// returned.
 	public int getWifiApState() {
 		Object result = invokeQuietly(getWifiApStateMethod, wm);
 		if (result == null) {
@@ -211,6 +215,8 @@ final public class WifiApControl {
 	}
 
 	// getWifiApConfiguration returns the current Wi-Fi AP configuration.
+	// If an error occured invoking the method via reflection, null is
+	// returned.
 	public WifiConfiguration getWifiApConfiguration() {
 		Object result = invokeQuietly(getWifiApConfigurationMethod, wm);
 		if (result == null) {
@@ -229,6 +235,8 @@ final public class WifiApControl {
 	// configuration. If one is already running, start using the new
 	// configuration. You should call WifiManager.setWifiEnabled(false)
 	// yourself before calling this method.
+	// If an error occured invoking the method via reflection, false is
+	// returned.
 	public boolean setWifiApEnabled(WifiConfiguration config, boolean enabled) {
 		Object result = invokeQuietly(setWifiApEnabledMethod, wm, config, enabled);
 		if (result == null) {
