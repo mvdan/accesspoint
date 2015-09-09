@@ -48,25 +48,25 @@ public class WifiApControl {
 
 	private static final String TAG = "WifiApControl";
 
-	private static Method getWifiApConfiguration;
-	private static Method getWifiApState;
-	private static Method isWifiApEnabled;
-	private static Method setWifiApEnabled;
+	private static Method getWifiApConfigurationMethod;
+	private static Method getWifiApStateMethod;
+	private static Method isWifiApEnabledMethod;
+	private static Method setWifiApEnabledMethod;
 
 	static {
 		for (Method method : WifiManager.class.getDeclaredMethods()) {
 			switch (method.getName()) {
 			case "getWifiApConfiguration":
-				getWifiApConfiguration = method;
+				getWifiApConfigurationMethod = method;
 				break;
 			case "getWifiApState":
-				getWifiApState = method;
+				getWifiApStateMethod = method;
 				break;
 			case "isWifiApEnabled":
-				isWifiApEnabled = method;
+				isWifiApEnabledMethod = method;
 				break;
 			case "setWifiApEnabled":
-				setWifiApEnabled = method;
+				setWifiApEnabledMethod = method;
 				break;
 			}
 		}
@@ -85,10 +85,10 @@ public class WifiApControl {
 	public static final int STATE_FAILED    = WIFI_AP_STATE_FAILED;
 
 	private static boolean isSoftwareSupported() {
-		return (getWifiApState != null
-				&& isWifiApEnabled != null
-				&& setWifiApEnabled != null
-				&& getWifiApConfiguration != null);
+		return (getWifiApStateMethod != null
+				&& isWifiApEnabledMethod != null
+				&& setWifiApEnabledMethod != null
+				&& getWifiApConfigurationMethod != null);
 	}
 
 	private static boolean isHardwareSupported() {
@@ -166,7 +166,7 @@ public class WifiApControl {
 	// isWifiApEnabled returns whether the Wi-Fi AP is currently enabled.
 	public boolean isWifiApEnabled() {
 		try {
-			return (Boolean) isWifiApEnabled.invoke(wm);
+			return (Boolean) isWifiApEnabledMethod.invoke(wm);
 		} catch (Exception e) {
 			Log.e(TAG, "", e);
 		}
@@ -190,7 +190,7 @@ public class WifiApControl {
 	// getWifiDeviceName returns the current Wi-Fi AP state.
 	public int getWifiApState() {
 		try {
-			return newStateNumber((Integer) getWifiApState.invoke(wm));
+			return newStateNumber((Integer) getWifiApStateMethod.invoke(wm));
 		} catch (Exception e) {
 			Log.e(TAG, "", e);
 		}
@@ -205,7 +205,7 @@ public class WifiApControl {
 	// getWifiApConfiguration returns the current Wi-Fi AP configuration.
 	public WifiConfiguration getWifiApConfiguration() {
 		try {
-			return (WifiConfiguration) getWifiApConfiguration.invoke(wm);
+			return (WifiConfiguration) getWifiApConfigurationMethod.invoke(wm);
 		} catch (Exception e) {
 			Log.e(TAG, "", e);
 		}
@@ -224,7 +224,7 @@ public class WifiApControl {
 	// yourself before calling this method.
 	public boolean setWifiApEnabled(WifiConfiguration config, boolean enabled) {
 		try {
-			return (Boolean) setWifiApEnabled.invoke(wm, config, enabled);
+			return (Boolean) setWifiApEnabledMethod.invoke(wm, config, enabled);
 		} catch (Exception e) {
 			Log.e(TAG, "", e);
 		}
