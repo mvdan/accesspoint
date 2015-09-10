@@ -16,6 +16,7 @@
 
 package cc.mvdan.accesspoint.example;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
@@ -149,6 +150,7 @@ public class MainActivity extends Activity {
 			this.reachable = new boolean[clients.size()];
 		}
 
+		@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 		private void compatAddAll(List<Client> clients) {
 			if (Build.VERSION.SDK_INT < 11) {
 				for (Client client : clients) {
