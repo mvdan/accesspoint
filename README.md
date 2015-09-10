@@ -30,9 +30,10 @@ Inet4Address addr4 = apControl.getInet4Address();
 Inet6Address addr6 = apControl.getInet6Address();
 
 // These are cached and may no longer be connected, see
-// apControl.getReachableClients(int, ReachableClientListener)
+// WifiApControl.getReachableClients(int, ReachableClientListener)
 List<WifiApControl.Client> clients = apControl.getClients()
 
+// Wifi must be disabled to enable the access point
 wifiManager.setWifiEnabled(false);
 apControl.enable();
 
