@@ -207,7 +207,6 @@ public class MainActivity extends Activity {
 			TextView desc;
 			TextView reach;
 		}
-
 	}
 
 	private void listClients(int timeout) {
@@ -221,12 +220,10 @@ public class MainActivity extends Activity {
 					}
 				});
 			}
-			public void onComplete() {
-			}
+			public void onComplete() { }
 		});
 		adapter.setClients(clients);
 	}
-
 
 	private void refresh() {
 		updateText();
@@ -255,9 +252,7 @@ public class MainActivity extends Activity {
 							button.setEnabled(true);
 						}
 					});
-				} catch (InterruptedException e) {
-					// ignored
-				}
+				} catch (InterruptedException e) { }
 			}
 		}.start();
 	}
