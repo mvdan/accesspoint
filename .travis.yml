@@ -4,4 +4,4 @@ android:
   components:
     - tools
     - build-tools-23.0.2
-    - android-22
+    - android-23
