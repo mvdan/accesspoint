@@ -18,11 +18,16 @@ package cc.mvdan.accesspoint.example;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,16 +51,47 @@ public class MainActivity extends Activity {
 	private WifiApControl apControl;
 	private ClientArrayAdapter adapter;
 
+	private static final int REQUEST_WRITE_SETTINGS = 1;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(this)) {
+			new AlertDialog.Builder(this)
+				.setMessage("Allow reading/writing the system settings? Necessary to set up access points.")
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						Intent intent = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+						intent.setData(Uri.parse("package:" + getPackageName()));
+						intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+						startActivityForResult(intent, REQUEST_WRITE_SETTINGS);
+					}
+				}).show();
+			return;
+		}
+		startControl();
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case REQUEST_WRITE_SETTINGS:
+			startControl();
+			break;
+		}
+	}
+
+	private void startControl() {
 		adapter = new ClientArrayAdapter(this, new ArrayList<Client>());
 		ListView listView = (ListView) findViewById(R.id.clientlist);
 		listView.setAdapter(adapter);
 
 		wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
 		apControl = WifiApControl.getInstance(this);
 
 		new Thread() {
@@ -108,6 +144,14 @@ public class MainActivity extends Activity {
 			sb.append("Warning: Wifi AP mode not supported!\n");
 			sb.append("You should get unknown or zero values below.\n");
 			sb.append("If you don't, isSupported() is probably buggy!\n");
+		}
+
+		if (apControl == null) {
+			sb.append("Something went wrong while trying to get AP control!\n");
+			sb.append("Make sure to grant the app the WRITE_SETTINGS permission.");
+			TextView tv = (TextView) findViewById(R.id.apinfo);
+			tv.setText(sb.toString());
+			return;
 		}
 
 		int state = apControl.getState();
@@ -210,6 +254,9 @@ public class MainActivity extends Activity {
 	}
 
 	private void listClients(int timeout) {
+		if (apControl == null) {
+			return;
+		}
 		List<Client> clients = apControl.getReachableClients(timeout,
 				new ReachableClientListener() {
 			public void onReachableClient(final Client client) {
