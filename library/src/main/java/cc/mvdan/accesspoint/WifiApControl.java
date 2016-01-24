@@ -21,6 +21,7 @@ import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.provider.Settings;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -118,6 +119,10 @@ final public class WifiApControl {
 	// the actual class when first called.
 	public static WifiApControl getInstance(Context context) {
 		if (instance == null) {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.System.canWrite(context)) {
+				Log.e(TAG, "6.0 or later, but haven't been granted WRITE_SETTINGS!");
+				return null;
+			}
 			instance = new WifiApControl(context);
 		}
 		return instance;
