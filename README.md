@@ -41,6 +41,11 @@ apControl.disable();
 wifiManager.setWifiEnabled(true);
 ```
 
+Remember to ask for `WRITE_SETTINGS` on 6.0+! The example app has a
+sample implementation of that. The library will not do this for you, as
+it involves UI interaction that should be handled and customizable by
+your app.
+
 ### Features
 
  * Enabling and disabling your AP
@@ -57,6 +62,7 @@ You will need the following:
 <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
 <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 <uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.WRITE_SETTINGS"/>
 ```
 
 ### How does it work?
