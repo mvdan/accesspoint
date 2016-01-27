@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-	compile 'cc.mvdan.accesspoint:library:0.1.3'
+	compile 'cc.mvdan.accesspoint:library:0.2.0'
 }
 ```
 
