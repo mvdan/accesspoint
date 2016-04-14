@@ -18,8 +18,8 @@ android {
 		targetCompatibility JavaVersion.VERSION_1_7
 	}
 
-        lintOptions {
-            checkReleaseBuilds false
-            abortOnError false
+	lintOptions {
+		checkReleaseBuilds false
+		abortOnError false
 	}
 }
