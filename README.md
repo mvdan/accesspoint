@@ -4,6 +4,14 @@
 
 Manage wireless access points on Android 2.2 or later.
 
+Note that this project is **abandoned** since its method doesn't work on Android
+7.1 or later. Have a look at these newer alternatives that have been tested to
+work on Android 8.0:
+
+* https://github.com/shinilms/direct-net-share
+* https://github.com/geekywoman/direct-net-share
+* https://github.com/aegis1980/WifiHotSpot
+
 ### Quick start
 
 ```gradle
